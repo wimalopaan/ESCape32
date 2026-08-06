@@ -29,7 +29,29 @@
 #define RES_OK    0
 #define RES_ERROR 1
 
+typedef struct {
+    const uint16_t start;
+    const uint8_t version;
+    const uint8_t io;
+    const uint8_t rev;
+} ID;
+static const ID magic = {
+    .start = 0xcdab,
+    #if defined(STM32F0)
+    .version = 1,
+    #elif defined(STM32G0)
+    .version = 2,
+    #elif defined(AT32F4)
+    .version = 3,
+    #elif defined(STM32G4)
+    .version = 4,
+    #endif
+    .io = IO_PIN,
+    .rev = REVISION
+};
+
 void main(void) {
+    __asm__ __volatile__("" :: "m" (magic)); // keep the magic
 	init();
 	initio();
 	if (RCC_CSR & (RCC_CSR_SFTRSTF | RCC_CSR_OBLRSTF)) { // Reboot
